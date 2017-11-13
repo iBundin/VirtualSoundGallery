@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<title>Virtual Sound Gallery</title>
+	<!-- <meta name="viewport" content="width=1024"> -->
+	<meta name="viewport" content="initial-scale=1.0,width=device-width,user-scalable=no" />
+	<meta name="keywords" content="Virtual, Sound, Gallery, Spatial sound, sound spatialization, electroacoustic music, media art, audiovisual art, virtual reality">
+	<meta name="description" content="Virtual Sound Gallery. The web stage for modern multichannel electroacoustic music, sound and audiovisual art.">
+	<link rel="stylesheet" type="text/css" href="./styles/styles.css">
+	<script src="./js/init.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+WebVRConfig = {
+  /**
+   * webvr-polyfill configuration
+   */
+
+  // Forces availability of VR mode.
+  FORCE_ENABLE_VR: true, // Default: false.
+  // Complementary filter coefficient. 0 for accelerometer, 1 for gyro.
+  //K_FILTER: 0.98, // Default: 0.98.
+  // How far into the future to predict during fast motion.
+  //PREDICTION_TIME_S: 0.040, // Default: 0.040 (in seconds).
+  // Flag to disable touch panner. In case you have your own touch controls
+  //TOUCH_PANNER_DISABLED: true, // Default: false.
+  // Enable yaw panning only, disabling roll and pitch. This can be useful for
+  // panoramas with nothing interesting above or below.
+  //YAW_ONLY: true, // Default: false.
+
+  /**
+   * webvr-boilerplate configuration
+   */
+  // Forces distortion in VR mode.
+  //FORCE_DISTORTION: true, // Default: false.
+  // Override the distortion background color.
+  // DISTORTION_BGCOLOR: {x: 1, y: 0, z: 0, w: 1}, // Default: (0,0,0,1).
+  // Prevent distortion from happening.
+  PREVENT_DISTORTION: true, // Default: false.
+  // Show eye centers for debugging.
+  // SHOW_EYE_CENTERS: true, // Default: false.
+  // Prevent the online DPDB from being fetched.
+  // NO_DPDB_FETCH: true,  // Default: false.
+};
+</script>
+	<!-- <script src="./js/three.min.js"></script> -->
+<script src="node_modules/webvr-boilerplate/node_modules/es6-promise/dist/es6-promise.js"></script>
+<!--
+  three.js 3d library
+  -->
+<script src="node_modules/webvr-boilerplate/node_modules/three/three.min.js"></script>
+
+
+<!--
+  VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+   -->
+<script src="node_modules/webvr-boilerplate/node_modules/three/examples/js/controls/VRControls.js"></script>
+
+<!--
+  VREffect.js handles stereo camera setup and rendering.
+  -->
+<script src="node_modules/webvr-boilerplate/node_modules/three/examples/js/effects/VREffect.js"></script>
+
+<!--
+  A polyfill for WebVR using the Device{Motion,Orientation}Event API.
+  -->
+<script src="node_modules/webvr-boilerplate/node_modules/webvr-polyfill/build/webvr-polyfill.js"></script>
+
+<!--
+  Helps enter and exit VR mode, provides best practices while in VR.
+  -->
+	<script src="js/webvr-manager.js"></script>
+	<!-- Uncomment to enable rendering in oculus rift -->
+	<!-- <script src="js/vsg-vrmanager.js"></script> -->
+
+	<script src="./js/sound2.js"></script>
+	<script src="./js/soundClass.js"></script>
+
+	<script src="./js/StereoEffect.js"></script>
+  	<script src="./js/DeviceOrientationControls.js"></script>
+  	<script src="./js/PointerLockControls.js"></script>
+
+<script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+
+
+<script>
+// $(window).load(function(){
+// 	showAllWorks(1, function () {showWork(4)})
+// })
+$(window).load(function(){
+    var backButton = $('#back-button')
+	backButton.click(function(){
+		setTimeout(showBlocker, 0)
+	});
+
+    var backButtonElement = backButton.get(0)
+    // Prevent button from being selected and dragged.
+    backButtonElement.draggable = false;
+    backButtonElement.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+    });
+
+})
+</script>
+
+<img id="back-button" title="Back to menu" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNHB4IiBoZWlnaHQ9IjI0cHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGRkZGRiI+CiAgICA8cGF0aCBkPSJNMCAwaDI0djI0SDB6IiBmaWxsPSJub25lIi8+CiAgICA8cGF0aCBkPSJNMjAgMTFINy44M2w1LjU5LTUuNTlMMTIgNGwtOCA4IDggOCAxLjQxLTEuNDFMNy44MyAxM0gyMHYtMnoiLz4KPC9zdmc+Cg==" />
+
+<div id="blocker">
+<div id="aboutVSG">
+<table style="margin:0 auto;vertical-align:top;" cellpadding="0" cellspacing="0"><tr><td width="50px"></td><td valign="top" width="800px">
+<p style="text-align:justify;margin:0;"><strong>Virtual Sound Gallery</strong> is a web stage for modern multichannel music, sound and audiovisual art. The works are presented in several virtual exhibitions, classified by concepts, styles and organizations.
+Please use your headphones to hear the 3d spatial effect, produced by the binaural algorithm.</p>
+<!-- <p style="text-align:justify;">Binaural recording is the technique also known as Dummy Head Recording,
+used to create realistic spatial sensation for the listener.
+We use this technology to let you listen to multichannel recordings in a
+virtual 3d-space, where you can find the best location for your aural experience.</p> -->
+
+<h3 style="text-align:left;margin-top:10px;margin-bottom: 5px;">Contributors</h3>
+<p style="text-align:left;margin-top: 5px;">
+Anton Andersen <a href="mailto:trianman@gmail.com">trianman@gmail.com</a> - WebVR functionality</br>
+Alexey Kopeikin <a href="mailto:kopeikin88@gmail.com">kopeikin88@gmail.com</a> - WebVR functionality</br>
+Alexander Scheglov <a href="mailto:akscheglov@gmail.com">akscheglov@gmail.com</a> - WebVR functionality
+</p>
+<h3 style="text-align:left;margin-top:5px;margin-bottom: 5px;">Call for works</h3>
+<p style="text-align:justify;margin-top: 5px;">
+If you want to expose your work on the Virtual Sound Gallery stage, please contact me by email.</p>
+<strong>Created by Andrey Bundin 2015-2016</strong><br>
+All rights reserved<br>
+<a href="mailto:ibundin@gmail.com">ibundin@gmail.com</a>
+
+<!-- <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_s-xclick">
+<input type="hidden" name="hosted_button_id" value="89VKBSYHQ88HL">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/ru_RU/i/scr/pixel.gif" width="1" height="1" style="visibility:hidden;">
+</form> -->
+<!-- Hello World! -->
+</td><td style="align:left;width:50px;margin:0;vertical-align:top;" valign="top"><span onclick="closeAboutVSG();" style="vertical-align:top;cursor:pointer;font-size:2.4em;margin:0 10px;">&#10005;</span></td></tr></table>
+</div>
+			<div id="instructions">
+				<span style="font-size:20px; letter-spacing: 0px;" id="author"></span><br>
+				<strong style="font-size:30px; letter-spacing: 0px;text-transform: uppercase;" id="work"></strong><br>
+				<span id="loading">
+					<span id="loaded">
+					</span>
+					<span id="allMedia">
+					</span>
+				</span>
+			</div>
+
+			<div id="description">
+				<span style="font-size:20px;text-transform: capitalize;" id="descriptionName"></span><br><br>
+				<span id="descript"></span><br><br>
+				<span id="place"></span>
+				<span id="year"></span>
+			</div>
+
+			<div id="page">
+				<div id="logo">
+					<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:0;">
+					<tr><td id="logoRow">
+					<img src="./images/log.png" style="margin:0 0 0 40px;height:36px;align:left;" id="logoImg" alt="Virtual Sound Gallery"> </td>
+					<td>
+					<h1 id="logoText" onclick="showExhibitions();">VIRTUAL SOUND GALLERY</h1>
+					</td><td class="backRow"></td></tr> </table>
+
+					<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin:0;"><tr>
+					<td align="right"><span id="about" onclick="showAboutVSG();">ABOUT</span>
+					</td><td style="width:6vw;"></td>
+					</tr></table>
+				</div>
+
+				<div id="container">
+					<div id="descr">
+						<div id="exDescr"><h2>Virtual Sound Gallery</h2>
+						<p style="font-size:1.1em;text-align:justify;">A web stage for modern multichannel music, sound and audiovisual art. Works are presented in several virtual exhibitions, classified by concepts, styles, and organizations.<br>
+						Please use <strong>headphones</strong> to perceive spatial sound decoded using binaural algorithms within the "Virtual Sound Gallery" environment. You can freely walk inside the VR space by pressing w-s-a-d or arrow keys and space to jump.<br>
+						<h3 style="text-align:center">Featured Virtual Exhibitions</h3>
+						</div>
+					</div>
+					<div id="post"></div>
+				</div>
+			</div>
+</div>
+
+
+		<!-- <div id="footer-line">
+
+					</div> -->
+
+		<script>
+			if ( isMobile() ) {
+				document.getElementById("descr").style.display = 'none';
+				document.getElementById("about").style.display = 'none';
+			}
+
+			var speakers = [];
+			var impulse = new loadImpulse("./audio/impulses/small_vox.wav");
+			function loadWork() {
+				material = new THREE.MeshPhongMaterial( { shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
+				var removeMesh;
+				loadedMedia = 0;
+				document.getElementById("loading").innerHTML = '' + loadedMedia + ' / ' + mediaElementsCount;
+				document.getElementById("instructions").style.cursor = 'default';
+
+				// STOP EVERYTHING
+				for (var i=0; i<speakers.length; i++) {
+					cancelAnimationFrame( animateId );
+					removeMesh = scene.getObjectByName(speakers[i].mesh.name);
+					scene.remove(removeMesh);
+					removeMesh = scene.getObjectByName(speakers[i].lighter.name);
+					scene.remove(removeMesh);
+					removeMesh = scene.getObjectByName(speakers[i].lighter1.name);
+					scene.remove(removeMesh);
+					if (! isMobile()) {
+						removeMesh = scene.getObjectByName(speakers[i].lighterShadow.name);
+						scene.remove(removeMesh);
+					}
+					speakers[i].stop();
+				}
+				if (videoAdded) scene.remove(movieScreen);
+				videoAdded=false;
+
+				//Destroy and recreate speakers
+				speakers.splice(0, speakers.length);
+				addSpeaker.objects.splice(0, speakers.length);
+				for (var i=1; i<spArr.length; i++) {
+					speakers.push(new addSpeaker(spArr[i].filename,spArr[i].x,spArr[i].y,spArr[i].z));
+				}
+				document.getElementById('instructions').style.visibility= "visible";
+			}
+			getExhibitions();
+		</script>
+		<script src="./js/animation.js"></script>
+		<!-- <canvas width="1920" height="979" style="width: 1920px; height: 979px;"></canvas> -->
+</body></html>
