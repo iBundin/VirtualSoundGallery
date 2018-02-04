@@ -1,0 +1,37 @@
+{
+  "name": "virtual-sound-gallery",
+  "version": "1.0.0",
+  "description": "Virtual Sound Gallery",
+  "main": "index.php",
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "webvr-boilerplate": "^0.5.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iBundin/VirtualSoundGallery.git"
+  },
+  "keywords": [
+    "Virtual",
+    "Sound",
+    "Gallery",
+    "sound",
+    "art",
+    "webvr",
+    "webgl",
+    "three.js",
+    "web",
+    "audio",
+    "api"
+  ],
+  "author": "Andrey Bundin",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/iBundin/VirtualSoundGallery/issues"
+  },
+  "homepage": "https://github.com/iBundin/VirtualSoundGallery#readme"
+}
