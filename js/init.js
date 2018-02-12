@@ -18,7 +18,6 @@ function isMobile() {
 	return check;
 }
 
-
 function exDescript(str) {
 	exDescStr = '<img align="left" style="margin:0 10px 0 0;" src="';
 	exDescStr += exhibitionsArr[str].artwork + '">'; 
@@ -29,6 +28,7 @@ function exDescript(str) {
 	document.getElementById('exDescr').innerHTML = exDescStr;
 	//document.getElementById('exNav').innerHTML=' &nbsp;::&nbsp; <span style="text-transform:uppercase;">' + exhibitionsArr[str].name + '</span>';
 }
+
 function workDescript(str) {
 	var workDescriptStr = '<img align="left" style="margin:0 10px 0 0;" src="'; 
 		workDescriptStr += worksArr[str].artwork;
@@ -40,22 +40,22 @@ function workDescript(str) {
 	document.getElementById('exDescr').innerHTML = workDescriptStr;
 	//document.getElementById('workNav').innerHTML = ' &nbsp;::&nbsp; <span style="text-transform:uppercase;">' + worksArr[str].name + '</span><i> by ' + worksArr[str].author + '</i>';
 }
+
 function hideText() {
 	document.getElementById('exDescr').innerHTML = '';
 	//document.getElementById('exNav').innerHTML   = '';
 	//document.getElementById('workNav').innerHTML = '';
 }
+
 function hideWorkText() {
 	document.getElementById('exDescr').innerHTML = exDescStr;
 	//document.getElementById('workNav').innerHTML = '';
 }
 
-
 function hideAll() {
 	document.getElementById("container").style.visibility = "hidden";
 	//document.getElementById("description").style.visibility = "hidden";
 }
-
 
 function getExhibitions() {
 		

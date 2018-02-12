@@ -5,6 +5,8 @@
   "main": "index.php",
   "dependencies": {
     "jquery": "^3.3.1",
+    "three": "^0.89.0",
+    "webvr": "0.0.0",
     "webvr-boilerplate": "^0.5.0"
   },
   "devDependencies": {},

@@ -8,7 +8,7 @@ $sql="SELECT * FROM exhibitions";
 
 $result = mysqli_query($con,$sql);
 $row = mysqli_fetch_assoc($result);
-$rows = [];
+$rows = array();
 do {
 	$rows[] = $row;
 } while($row = mysqli_fetch_assoc($result));

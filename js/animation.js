@@ -10,11 +10,22 @@ var blocker = document.getElementById( 'blocker' );
 var backButton = document.getElementById( 'back-button');
 var instructions = document.getElementById( 'instructions' );
 
-var controlsType = true
-function setOrientationControls() {
-		controlsEnabled = false;
-		//controls.enabled = true;
-		controlsType = false;
+var ControlsType = {
+	MOUSE: 1,
+	PHONE: 2,
+	VR: 3,
+  };
+
+var controlsType = ControlsType.MOUSE;
+
+function setControlsType(controlsTypeArg){
+	controlsType = controlsTypeArg;
+	
+	switch(controlsTypeArg){
+		case ControlsType.PHONE:
+			controlsEnabled = false;
+			break;
+	}
 }
 
 var havePointerLock = false
@@ -36,31 +47,23 @@ function hideBlocker() {
 	backButton.style.display = 'inline-block';
 }
 
-if ( havePointerLock ) {
+if (havePointerLock) {
 
 	var element = document.body;
 
 	var pointerlockchange = function ( event ) {
-
 		if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-
 			controlsEnabled = true;
 			controls.enabled = true;
 			hideBlocker()
-
 		} else {
-
 			controls.enabled = false;
 			showBlocker()
-
 		}
-
 	}
 
 	var pointerlockerror = function ( event ) {
-
 		instructions.style.display = '';
-
 	}
 
 	// Hook pointer lock state change events
@@ -72,12 +75,10 @@ if ( havePointerLock ) {
 	document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
 	document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
 
-
+	setControlsType(ControlsType.MOUSE);
 
 } else {
-
-	setOrientationControls();
-
+	setControlsType(ControlsType.PHONE);
 }
 
 init();
@@ -92,60 +93,60 @@ var velocity = new THREE.Vector3();
 var touchWalkingSpeed = 0; // walking-on-touch speed
 var avg = 0;
 
-
 function init() {
 
+	// CAMERA
 	camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
 	scene = new THREE.Scene();
-	// scene.fog = new THREE.FogExp2( 0x000000, 0.005, 1850 );
-
-	/*var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.005 );
-	light.position.set( 0.5, 1, 0.75 );
-	scene.add( light );*/
-
-	// skyBoxCamera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
-	// skyBoxScene = new THREE.Scene();
+	scene.add(camera);
 
 	// SKYBOX
 	var imagePrefix = "images/nebula2_";
 	var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 	var imageSuffix = ".png";
-	var skyGeometry = new THREE.CubeGeometry( 1000, 1000, 1000 );
+	
+	var backugroundSides = [];
+	for (var i = 0; i < 6; i++){
+		backugroundSides.push(imagePrefix + directions[i] + imageSuffix);
+	};
+	 
+	var background = new THREE.CubeTextureLoader().load(backugroundSides);
 
-	var materialArray = [];
-	for (var i = 0; i < 6; i++)
-		materialArray.push( new THREE.MeshBasicMaterial({
-			map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
-			side: THREE.BackSide
-		}));
-	var skyMaterial = new THREE.MeshFaceMaterial( materialArray );
-	skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
-	// skyBoxScene.add( skyBox );
-	scene.add( skyBox );
-
-
-	geometry = new THREE.BoxGeometry( 10, 10, 10 );
-	for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-		var face = geometry.faces[ i ];
-		face.vertexColors[ 0 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-		face.vertexColors[ 1 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-		face.vertexColors[ 2 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-	}
-	material = new THREE.MeshPhongMaterial( { shading: THREE.FlatShading, vertexColors: THREE.VertexColors } );
-	//material = new THREE.MeshLambertMaterial( { vertexColors: THREE.VertexColors } );
-
+	background.format = THREE.RGBFormat;
+	scene.background = background;
 
 	//Control Type
-	if (controlsType) {
-		controls = new THREE.PointerLockControls( camera );
-		scene.add( controls.getObject() );
-	} else {
-		controls = new THREE.DeviceOrientationControls(camera);
-  		controls.connect();
-  		camera.position.y = 10;
+	function gotVRDisplays( displays ) {
+		if ( displays.length > 0 ) {
+			setControlsType(ControlsType.VR);
+
+			controls = new THREE.VRControls(camera, null);
+			controls.standing = true;
+			//camera.position.y = 20;
+		} else {
+			console.warn( 'VR input not available. Using default controls.' );
+		}
+	}
+	
+	if (navigator.getVRDisplays) {
+		var displays = navigator.getVRDisplays().then(gotVRDisplays).catch(function () {
+			console.warn( 'VR input not available. Using default controls.' );
+
+		});
 	}
 
+	switch(controlsType){
+		case ControlsType.MOUSE:
+			controls = new THREE.PointerLockControls( camera );
+			scene.add(controls.getObject());
+		break;
 
+		case ControlsType.PHONE:
+			controls = new THREE.DeviceOrientationControls(camera);
+			controls.connect();
+			camera.position.y = 10;
+		break;
+	}
 
 	var onKeyDown = function ( event ) {
 		switch ( event.keyCode ) {
@@ -171,6 +172,7 @@ function init() {
 				break;
 		}
 	};
+
 	var onKeyUp = function ( event ) {
 		switch( event.keyCode ) {
 			case 38: // up
@@ -209,12 +211,9 @@ function init() {
 
 	raycaster = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
 
-
-
 	var upperLight = new THREE.PointLight( 0xffdddd, 2, 300 );
 	upperLight.position.set( 0, 170, 0 );
 	scene.add( upperLight );
-
 	
 	// floor
 	geometry = new THREE.PlaneGeometry( 800, 800, 100, 100 );
@@ -246,8 +245,6 @@ function init() {
 	mesher = new THREE.Mesh( geometry, material );
 	scene.add( mesher );
 
-
-
 	geometry = new THREE.BoxGeometry( 15, 15, 15 );
 	for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 		var face = geometry.faces[ i ];
@@ -260,6 +257,7 @@ function init() {
 	renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
 	var effect = new THREE.VREffect(renderer);
 	effect.setSize(window.innerWidth, window.innerHeight);
+
     manager = new WebVRManager(renderer, effect);
 	// renderer.setClearColor( 0x000000, 0 );
 	renderer.setPixelRatio( window.devicePixelRatio );
@@ -268,6 +266,7 @@ function init() {
 	// renderer.autoClear = false;
 
 	window.addEventListener( 'resize', onWindowResize, false );
+
 	//document.getElementById("post").style.height=window.innerHeight-400+'px';
 }
 
@@ -281,6 +280,8 @@ function onWindowResize() {
 
 }
 
+var PI_2 = Math.PI / 2;
+
 function animate() {
 
 	animateId = requestAnimationFrame( animate );
@@ -288,28 +289,42 @@ function animate() {
 	var time = performance.now();
 	var delta = ( time - prevTime ) / 1000;
 
-	if ( !controlsType ) {
-		controls.update();
+	switch(controlsType){
+		case ControlsType.PHONE:
+			controls.update();
+			touchWalkingSpeed -= touchWalkingSpeed * 10.0 * delta;
 
-		// walking-on-touch
-		touchWalkingSpeed -= touchWalkingSpeed * 10.0 * delta;
+			if ( moveForward ) {
+				touchWalkingSpeed -= 400.0 * delta;
+				camera.translateZ( touchWalkingSpeed * delta );
+				camera.position.y = 10;
+			}
+		break;
 
-		if ( moveForward ) {
-			touchWalkingSpeed -= 400.0 * delta;
-			controls.getObject().translateZ( touchWalkingSpeed * delta );
-			controls.getObject().position.y = 10;
-		}
+		case ControlsType.VR:
+			controls.update();
+			//camera.position.y = 10;
 
-		skyBox.position.copy( controls.getObject().position );
+			var listenerX = Math.cos(camera.rotation.y+PI_2)*PI_2;
+			var listenerZ = -Math.sin(camera.rotation.y+PI_2)*PI_2;
+			var listenerY = Math.max( - PI_2, Math.min( PI_2, camera.rotation.x ) );
+			
+			if(!isNaN(listenerX) && !isNaN(listenerZ) && !isNaN(listenerY)){
+				listener.setOrientation(listenerX, listenerY, listenerZ, 0, 1, 0);
+			}
+
+			listener.setPosition(camera.position.x, camera.position.y, camera.position.z);
+		break;
 	}
 
 	for (var i=0; i<speakers.length;i++) {
 		speakers[i].analyzitor();
 	}
 
-	//light1.intensity = avg;
-	if ( controlsEnabled ) {
-		raycaster.ray.origin.copy( controls.getObject().position );
+	if ( controlsEnabled && controlsType != ControlsType.VR) {
+		var yawObject = controls.getObject();
+
+		raycaster.ray.origin.copy( yawObject.position );
 		raycaster.ray.origin.y -= 10;
 
 		var intersections = raycaster.intersectObjects( objects );
@@ -333,24 +348,26 @@ function animate() {
 			canJump = true;
 		}
 
-		controls.getObject().translateX( velocity.x * delta );
-		controls.getObject().translateY( velocity.y * delta );
-		controls.getObject().translateZ( velocity.z * delta );
+		yawObject.translateX( velocity.x * delta );
+		yawObject.translateY( velocity.y * delta );
+		yawObject.translateZ( velocity.z * delta );
 
-		skyBox.position.copy( controls.getObject().position );
+		//skyBox.position.copy( controls.getObject().position );
 
-		if ( controls.getObject().position.y < 10 ) {
-
+		if ( yawObject.position.y < 10 ) {
 			velocity.y = 0;
-			controls.getObject().position.y = 10;
-
+			yawObject.position.y = 10;
 			canJump = true;
-
 		}
 
-		listener.setPosition(controls.getObject().position.x, controls.getObject().position.y, controls.getObject().position.z);
-	}
+		var pitchObject = yawObject.children[0];
 
+		var listenerX = Math.cos(yawObject.rotation.y+PI_2)*PI_2;
+		var listenerZ = -Math.sin(yawObject.rotation.y+PI_2)*PI_2;
+
+		listener.setOrientation(listenerX, pitchObject.rotation.x, listenerZ, 0, 1, 0);
+		listener.setPosition(yawObject.position.x, yawObject.position.y, yawObject.position.z);
+	}
 
 	prevTime = time;
 
@@ -368,12 +385,6 @@ function render()
 		}
 	}
 
-	// skyBoxCamera.rotation.setFromRotationMatrix( new THREE.Matrix4().extractRotation( camera.matrixWorld ), skyBoxCamera.rotation.Order );
-
-	// renderer.clear();
-	// manager.render( skyBoxScene, skyBoxCamera );
-	// renderer.clearDepth();
 	manager.render( scene, camera );
-
 }
 

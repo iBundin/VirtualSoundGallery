@@ -311,7 +311,7 @@ function canPlayItAll() {
 		animate();
 						
 		// Ask the browser to lock the pointer
-		if (controlsType) {
+		if (controlsType == ControlsType.MOUSE) {
 			element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
 			if ( /Firefox/i.test( navigator.userAgent ) ) {
 				var fullscreenchange = function ( event ) {
